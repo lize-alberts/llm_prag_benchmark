@@ -1,0 +1,6 @@
+*.xlsx
+*.png
+__pycache__/
+.env
+llm_eval-env/
+!inputs.xlsx
