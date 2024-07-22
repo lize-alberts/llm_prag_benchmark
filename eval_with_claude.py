@@ -3,20 +3,21 @@ LLM Pragmatic Harms Eval
 
 This script runs a benchmark on language models using conversations (5 turns of user input) 
 from an Excel file.
-It currently uses 7 popular models for generating responses (i.e. the test model) and 
-Meta's Llama3 70B for evaluation (i.e. the eval model), which can be substituted as required. 
+
+It currently uses 8 popular models for generating responses (i.e. the test model) and 
+Claude-3.5-Sonnet for evaluation (i.e. the eval model), which can be substituted as required. 
 
 Setup:
 1. Install required packages: pip install -r requirements.txt (+ anything required for your own test/eval models)
 2. Get API keys for test and eval models and ensure you have enough credits for a few hundred calls (~1000 tokens/call) to each.
-3. Set up environment variables:
-   - export TEST_API_KEY=<your_test_model_api_key> (in this case, OPENAI_API_KEY)
-   - export EVAL_API_KEY=<your_eval_model_api_key> (in this case, REPLICATE_API_TOKEN)
+3. Set up environment variables for all models:
+   - export MODEL_API_KEY=<model_api_key>
 4. Ensure the 'inputs.xlsx' file is saved in the same directory as the script.
-5. Run the script: python benchmark_script.py
+5. Run the script: python eval_with_claude.py
 
 The script will process each conversation, generate model responses, evaluate them,
-and save the results in a new Excel file named 'inputs_with_eval.xlsx'.
+and save the results in new Excels file named 'eval_results_binary.xlsx' and 'eval_results_neutral.xlsx'. 
+Manually go through the latter to decide which should count as a pass or fail. 
 
 """
 
