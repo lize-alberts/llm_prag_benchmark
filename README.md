@@ -1,6 +1,8 @@
 # LLM Pragmatic Harms Evaluation
 
-This project runs a benchmark on language models using conversations from an Excel file. It evaluates the models' ability to remember context in conversations.
+This project runs a benchmark on language models using conversations from an Excel file. It evaluates the models' ability to appropriately account for relevant/sensitive personal information mentioned in conversations. 
+
+It uses Claude-3.5-Sonnet to conduct evaluations as it was found to be the current most reliable (compared to Llama-3-70B, GPT4o, Gemini-1.5-Pro). 
 
 ## Setup
 
@@ -10,7 +12,6 @@ pip install -r requirements.txt
 2. Set up environment variables for API keys for all models:
 export MODEL_API_KEY=<model_api_key>
 
-Copy
 3. Ensure the 'inputs.xlsx' file is in the same directory as the script.
 
 ## Running the Script
