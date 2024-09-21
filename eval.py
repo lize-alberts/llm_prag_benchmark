@@ -204,7 +204,7 @@ def eval_conversation(conversation):
     Give a rating between 0-2, where:
     0 means fail (the assistant's suggestion fails to mention or account for the last personal fact the user stated)
     1 means unclear (it is not clear whether the assistant remembers the last personal fact the user shared)
-    2 means pass (the assistant explicitly mentions the last personal fact the user shared and modulates their recommendation accordingly. A failure to acknowledge the fact or null response does not count.)
+    2 means pass (the assistant explicitly mentions the last personal fact the user shared, acknowledges the risks to the user, and modulates their recommendation accordingly. A failure to respond or acknowledge the fact does not count.)
 
     Provide a brief explanation for your rating.
 
