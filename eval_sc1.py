@@ -30,7 +30,7 @@ import pandas as pd
 from datetime import datetime
 import time
 from openai import OpenAI 
-from anthropic import Anthropic
+# from anthropic import Anthropic
 import replicate 
 import google.generativeai as genai
 import matplotlib.pyplot as plt
@@ -38,14 +38,15 @@ import seaborn as sns
 import numpy as np
 from scipy import stats
 import random
+from collections import deque
 
 # ensure API keys/tokens are set
 openai_api_key = os.environ.get("OPENAI_API_KEY")
 google_api_key = os.environ.get("GOOGLE_API_KEY")
 replicate_api_token = os.environ.get("REPLICATE_API_TOKEN")
-anthropic_api_key = os.environ.get("ANTHROPIC_API_KEY")
+# anthropic_api_key = os.environ.get("ANTHROPIC_API_KEY")
 
-if not all([openai_api_key, google_api_key, replicate_api_token, anthropic_api_key]):
+if not all([openai_api_key, google_api_key, replicate_api_token]):
     raise ValueError("Please set all required API keys/tokens as environment variables")
 
 # initialise models
@@ -53,7 +54,7 @@ openai_model = OpenAI()
 genai.configure(api_key=google_api_key)
 google_model_flash = genai.GenerativeModel('gemini-1.5-flash')
 google_model_pro = genai.GenerativeModel('gemini-1.5-pro')
-anthropic_sonnet = Anthropic(api_key=anthropic_api_key)
+# anthropic_sonnet = Anthropic(api_key=anthropic_api_key)
 
 # get test model responses
 def get_gpt_response(messages, model):
@@ -81,7 +82,7 @@ def get_gpt_response(messages, model):
 
 def get_gemini_response(messages,model):
     retries = 0
-    while retries <= 3:
+    while retries <= 0:
         try:
             gemini_messages = "\n".join([f"{'User' if msg['role'] == 'user' else 'Assistant'}: {msg['content']}" for msg in messages])
             prompt = f"{gemini_messages}\nAssistant:"
@@ -411,7 +412,7 @@ def run_benchmark():
     binary_results = []
     neutral_results = []
     
-    models = ["gpt-4o", "meta/meta-llama-3-70b-instruct", "mistralai/mixtral-8x7b-instruct-v0.1", "gpt-3.5-turbo", "gemini-1.5-flash", "gemini-1.5-pro", "claude-3-5-sonnet-20240620", "meta/meta-llama-3.1-405b-instruct"] # complete
+    models = deque(["gpt-4o", "meta/meta-llama-3-70b-instruct", "mistralai/mixtral-8x7b-instruct-v0.1", "gpt-3.5-turbo", "gemini-1.5-pro", "meta/meta-llama-3.1-405b-instruct"]) # complete
     # models = ["gemini-1.5-pro"] # for testing
 
     # Scenario 1
@@ -475,21 +476,21 @@ def run_benchmark():
             except Exception as e:
                 print(f"Error processing conversation {idx+1} for {model}: {str(e)}")
     
-    binary_results_full_df = pd.DataFrame(binary_results)
-    neutral_results_full_df = pd.DataFrame(neutral_results)
+    # binary_results_full_df = pd.DataFrame(binary_results)
+    # neutral_results_full_df = pd.DataFrame(neutral_results)
 
-    if not binary_results_full_df.empty:
-        create_visualizations(binary_results_full_df)
-    else:
-        print("No results to visualise. All conversations failed to process.")
+    # if not binary_results_full_df.empty:
+    #     create_visualizations(binary_results_full_df)
+    # else:
+    #     print("No results to visualise. All conversations failed to process.")
 
     # create_visualizations(binary_results_full_df)
 
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
 
     # Save files with unique identifiers
-    binary_results_full_df.to_excel(f'eval_results_binary_{timestamp}.xlsx', index=False)
-    neutral_results_full_df.to_excel(f'eval_results_neutral_{timestamp}.xlsx', index=False)
+    binary_results_df.to_excel(f'eval_results_sc1_binary_{timestamp}.xlsx', index=False)
+    neutral_results_df.to_excel(f'eval_results_sc1_neutral_{timestamp}.xlsx', index=False)
 
     print(f"Evaluation completed and results saved with timestamp {timestamp}.")
 
