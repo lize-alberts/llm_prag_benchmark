@@ -4,3 +4,4 @@ __pycache__/
 .env
 llm_eval-env/
 !inputs.xlsx
+.DS_Store
