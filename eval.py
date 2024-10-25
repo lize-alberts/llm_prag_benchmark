@@ -40,20 +40,20 @@ from scipy import stats
 import random
 
 # ensure API keys/tokens are set
-openai_api_key = os.environ.get("OPENAI_API_KEY")
-google_api_key = os.environ.get("GOOGLE_API_KEY")
-replicate_api_token = os.environ.get("REPLICATE_API_TOKEN")
-anthropic_api_key = os.environ.get("ANTHROPIC_API_KEY")
+# openai_api_key = os.environ.get("OPENAI_API_KEY")
+# google_api_key = os.environ.get("GOOGLE_API_KEY")
+# replicate_api_token = os.environ.get("REPLICATE_API_TOKEN")
+# anthropic_api_key = os.environ.get("ANTHROPIC_API_KEY")
 
-if not all([openai_api_key, google_api_key, replicate_api_token, anthropic_api_key]):
-    raise ValueError("Please set all required API keys/tokens as environment variables")
+# if not all([openai_api_key, google_api_key, replicate_api_token, anthropic_api_key]):
+#     raise ValueError("Please set all required API keys/tokens as environment variables")
 
-# initialise models
-openai_model = OpenAI() 
-genai.configure(api_key=google_api_key)
-google_model_flash = genai.GenerativeModel('gemini-1.5-flash')
-google_model_pro = genai.GenerativeModel('gemini-1.5-pro')
-anthropic_sonnet = Anthropic(api_key=anthropic_api_key)
+# # initialise models
+# openai_model = OpenAI() 
+# genai.configure(api_key=google_api_key)
+# google_model_flash = genai.GenerativeModel('gemini-1.5-flash')
+# google_model_pro = genai.GenerativeModel('gemini-1.5-pro')
+# anthropic_sonnet = Anthropic(api_key=anthropic_api_key)
 
 # get test model responses
 def get_gpt_response(messages, model):
@@ -355,20 +355,22 @@ def create_visualizations(results_df):
         plt.close()
 
     # 2. Heatmaps for each scenario
-    for scenario in scenarios:
-        scenario_df = results_df[results_df['Scenario'] == scenario]
-        pivot_df = scenario_df.pivot(index='Conversation Number', columns='Model', values='Evaluation Rating')
+    # for scenario in scenarios:
+    #     scenario_df = results_df[results_df['Scenario'] == scenario]
+    #     pivot_df = scenario_df.pivot(index='Conversation Number', columns='Model', values='Evaluation Rating')
         
-        plt.figure(figsize=(12, 8))
-        sns.heatmap(pivot_df, cmap='RdYlGn', cbar_kws={'label': 'Evaluation Rating'}, vmin=0, vmax=1, annot=True, fmt='.2f')
-        plt.title(f'Model Performance for {scenario}')
-        plt.tight_layout()
-        plt.savefig(f'performance_heatmap_{scenario.lower().replace(" ", "_")}.png', dpi=300)
-        plt.close()
+    #     plt.figure(figsize=(12, 8))
+    #     sns.heatmap(pivot_df, cmap='RdYlGn', cbar_kws={'label': 'Evaluation Rating'}, vmin=0, vmax=1, annot=True, fmt='.2f')
+    #     plt.title(f'Model Performance for {scenario}')
+    #     plt.tight_layout()
+    #     plt.savefig(f'performance_heatmap_{scenario.lower().replace(" ", "_")}.png', dpi=300)
+    #     plt.close()
 
     # 3. Overall Bar Plot
     plt.figure(figsize=(15, 8))
     overall_pass_rates = results_df.groupby(['Model', 'Scenario'])['Evaluation Rating'].mean().unstack()
+    # keep_scenarios = ["Scenario {i}".format(i=i) for i in range(1, 6)]
+    overall_pass_rates = overall_pass_rates.filter(like="Scenario 3 (")
     overall_pass_rates.plot(kind='bar', stacked=False)
     plt.title('Pass Rate by Model and Scenario')
     plt.xlabel('Model')

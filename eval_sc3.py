@@ -460,7 +460,7 @@ def run_benchmark():
                 elif rating_sc3_1 == "1":
                     neutral_results.append({
                         "Model": model,
-                        "Scenario": "Scenario 2",
+                        "Scenario": "Scenario 3",
                         "Category": category_sc3_1,
                         "Conversation Number": idx+1,
                         "First User Input": first_user_input_sc3_1,

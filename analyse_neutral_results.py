@@ -85,7 +85,6 @@ def create_visualizations(results_df):
     # 1. Heatmap of ambiguity factors by category and scenario
     plt.figure(figsize=(12, 8))
     heatmap_data = pd.crosstab(results_df['Category'], [results_df['Scenario'], results_df['Ambiguity Factor']], normalize='index')
-    
     # Rename columns to remove "Scenario" prefix
     heatmap_data.columns = heatmap_data.columns.set_levels(
         [f"{i}" for i in range(1, 6)], level=0
@@ -106,7 +105,7 @@ def create_visualizations(results_df):
     plt.ylabel('Percentage', fontsize=10)
     plt.legend(title='Factors Contributing to Ambiguous Results', bbox_to_anchor=(0.5, -0.15), loc='upper center', ncol=3, fontsize=10)
     
-    ax.set_xticklabels(range(1, 6), fontsize=10, rotation=0)  # Set rotation to 0 for upright labels
+    # ax.set_xticklabels(range(1, 6), fontsize=10, rotation=0)  # Set rotation to 0 for upright labels
     plt.yticks(fontsize=10)
     
     for c in ax.containers:
@@ -198,17 +197,90 @@ def calculate_statistics(results_df):
 def analyze_ambiguous_results(results_df, total_inputs=337):
     # Update model names
     results_df['Model'] = results_df['Model'].apply(shorten_model_name)
-    
+
     # Count ambiguous results for each model
     ambiguous_counts = results_df.groupby('Model').size()
-    
+
     # Calculate the proportion of ambiguous results
     ambiguous_proportions = ambiguous_counts / total_inputs
-    
+
     # Sort the proportions in descending order
     ambiguous_proportions_sorted = ambiguous_proportions.sort_values(ascending=False)
-    
+
     return ambiguous_proportions_sorted
+
+
+results_files = [
+    # "eval_results_sc1_binary_20240922_195817.xlsx",
+    "eval_results_sc1_binary_20240923_025316.xlsx",
+    "eval_results_sc1_binary_20240923_221728.xlsx",
+    "eval_results_sc1_binary_20240925_002013.xlsx",
+    # "eval_results_sc1_neutral_20240922_195817.xlsx",
+    "eval_results_sc1_neutral_20240923_025316.xlsx",
+    "eval_results_sc2_binary_20240923_032713.xlsx",
+    "eval_results_sc2_binary_20240923_225509.xlsx",
+    "eval_results_sc2_binary_20240925_003659.xlsx",
+    "eval_results_sc2_neutral_20240923_032713.xlsx",
+    "eval_results_sc3_binary_20240923_032652.xlsx",
+    "eval_results_sc3_binary_20240923_225638.xlsx",
+    "eval_results_sc3_binary_20240925_004518.xlsx",
+    "new_results/eval_results_sc3_neutral_20240923_032652.xlsx",
+    "eval_results_sc4_binary_20240923_033502.xlsx",
+    "eval_results_sc4_binary_20240923_225045.xlsx",
+    "eval_results_sc4_binary_20240925_005645.xlsx",
+    "eval_results_sc4_neutral_20240923_033502.xlsx",
+    "eval_results_sc5_binary_20240923_032552.xlsx",
+    "eval_results_sc5_binary_20240923_223755.xlsx",
+    "eval_results_sc5_binary_20240925_004204.xlsx",
+    "eval_results_sc5_neutral_20240923_032552.xlsx",
+    # "eval_results_ablation_binary_20240923_050130.xlsx",
+    "eval_results_ablation_binary_20240924_035111.xlsx",
+    "eval_results_ablation_binary_20240925_034658.xlsx",
+    "eval_results_ablation_binary_20240925_035448.xlsx",
+    "eval_results_ablation_neutral_20240923_050130.xlsx",
+    "eval_results_sc1_binary_20241015_032359.xlsx",
+    "eval_results_sc1_neutral_20241015_032359.xlsx",
+    "eval_results_sc5_binary_20241015_041210.xlsx",
+    "eval_results_sc5_neutral_20241015_041210.xlsx",
+    "eval_results_sc3_binary_20241015_050043.xlsx",
+    "new_results/eval_results_sc3_neutral_20241015_050043.xlsx",
+    "eval_results_sc2_binary_20241015_052152.xlsx",
+    "eval_results_sc2_neutral_20241015_052152.xlsx",
+    "eval_results_sc4_binary_20241015_054259.xlsx",
+    "eval_results_sc4_neutral_20241015_054259.xlsx",
+    "eval_results_sc1_binary_20241018_001146.xlsx",
+    "eval_results_sc1_neutral_20241018_001146.xlsx",
+    "eval_results_sc2_binary_20241018_004109.xlsx",
+    "eval_results_sc2_neutral_20241018_004109.xlsx",
+    "eval_results_sc3_binary_20241018_004827.xlsx",
+    "new_results/eval_results_sc3_neutral_20241018_004827.xlsx",
+    "eval_results_sc5_binary_20241018_004943.xlsx",
+    "eval_results_sc5_neutral_20241018_004943.xlsx",
+    "eval_results_sc4_binary_20241018_005119.xlsx",
+    "eval_results_sc4_neutral_20241018_005119.xlsx",
+    "eval_results_sc1_binary_20241021_000514.xlsx",
+    "eval_results_sc1_neutral_20241021_000514.xlsx",
+    "eval_results_sc3_binary_20241021_002410.xlsx",
+    "new_results/eval_results_sc3_neutral_20241021_002410.xlsx",
+    "eval_results_sc5_binary_20241021_002545.xlsx",
+    "eval_results_sc5_neutral_20241021_002545.xlsx",
+    "eval_results_sc2_binary_20241021_003630.xlsx",
+    "eval_results_sc2_neutral_20241021_003630.xlsx",
+    "eval_results_sc4_binary_20241021_004658.xlsx",
+    "eval_results_sc4_neutral_20241021_004658.xlsx",
+]
+
+
+def load_results(file_path):
+    return pd.read_excel(file_path)
+
+
+def load_all_results(file_paths):
+    return [
+        load_results(file_path) for file_path in file_paths if "neutral" in file_path
+    ]
+
+
 
 def main():
     scenarios = range(1, 6)
@@ -216,29 +288,40 @@ def main():
     
     all_results = []
 
-    for scenario in scenarios:
-        for iteration in iterations:
-            file_path = f'eval_results_sc{scenario}_neutral_{iteration}.xlsx'
-            try:
-                print(f"\nReading file: {file_path}")
-                df = pd.read_excel(file_path)
-                df['Scenario'] = f'Scenario {scenario}'
-                df['Iteration'] = iteration
-                all_results.append(df)
-            except FileNotFoundError:
-                print(f"File not found: {file_path}")
-                continue
+    all_results = load_all_results(results_files)
+    results_df = pd.concat([df.assign(File=i) for i, df in enumerate(all_results)], ignore_index=True)
+    # for scenario in scenarios:
+    #     for iteration in iterations:
+    #         file_path = f'eval_results_sc{scenario}_neutral_{iteration}.xlsx'
+    #         try:
+    #             print(f"\nReading file: {file_path}")
+    #             df = pd.read_excel(file_path)
+    #             df['Scenario'] = f'Scenario {scenario}'
+    #             df['Iteration'] = iteration
+    #             all_results.append(df)
+    #         except FileNotFoundError:
+    #             print(f"File not found: {file_path}")
+    #             continue
 
-    if not all_results:
-        print("No valid files found. Please check the file naming and path.")
-        return
+    # if not all_results:
+    #     print("No valid files found. Please check the file naming and path.")
+    #     return
+    
+    # results_df = pd.concat(all_results, ignore_index=True)
+    # print("\nCategorizing ambiguity factors...")
+    # results_df['Ambiguity Factor'] = results_df['Evaluation Explanation'].apply(categorize_ambiguity_factor)
 
-    results_df = pd.concat(all_results, ignore_index=True)
-    print("\nCategorizing ambiguity factors...")
-    results_df['Ambiguity Factor'] = results_df['Evaluation Explanation'].apply(categorize_ambiguity_factor)
+    # # # Save categorization results
+    # results_df.to_csv('categorization_results.csv', index=False)
+    # exit()
+    results_df = pd.read_csv("categorization_results.csv")
 
-    # Save categorization results
-    results_df.to_csv('categorization_results.csv', index=False)
+    def group_up(gdf):
+        gdf["Iteration"] = gdf.groupby(["File"]).ngroup()
+        return gdf
+    results_df = results_df.groupby(["Model", "Scenario"]).apply(group_up).reset_index(drop=True)
+    results_df = results_df[results_df["Scenario"].isin([f"Scenario {i}" for i in range(1, 6)])]
+    print(results_df["Scenario"].unique())
     print("Categorization results saved to categorization_results.csv")
 
     print("Creating visualizations...")
