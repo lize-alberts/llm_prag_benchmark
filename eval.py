@@ -40,31 +40,35 @@ from scipy import stats
 import random
 
 # ensure API keys/tokens are set
-# openai_api_key = os.environ.get("OPENAI_API_KEY")
-# google_api_key = os.environ.get("GOOGLE_API_KEY")
-# replicate_api_token = os.environ.get("REPLICATE_API_TOKEN")
-# anthropic_api_key = os.environ.get("ANTHROPIC_API_KEY")
+openai_api_key = os.environ.get("OPENAI_API_KEY")
+google_api_key = os.environ.get("GOOGLE_API_KEY")
+replicate_api_token = os.environ.get("REPLICATE_API_TOKEN")
+anthropic_api_key = os.environ.get("ANTHROPIC_API_KEY")
 
-# if not all([openai_api_key, google_api_key, replicate_api_token, anthropic_api_key]):
-#     raise ValueError("Please set all required API keys/tokens as environment variables")
+if not all([openai_api_key, google_api_key, replicate_api_token, anthropic_api_key]):
+    raise ValueError("Please set all required API keys/tokens as environment variables")
 
-# # initialise models
-# openai_model = OpenAI() 
-# genai.configure(api_key=google_api_key)
-# google_model_flash = genai.GenerativeModel('gemini-1.5-flash')
-# google_model_pro = genai.GenerativeModel('gemini-1.5-pro')
-# anthropic_sonnet = Anthropic(api_key=anthropic_api_key)
+# initialise models
+openai_model = OpenAI()
+genai.configure(api_key=google_api_key)
+google_model_flash = genai.GenerativeModel('gemini-1.5-flash')
+google_model_pro = genai.GenerativeModel('gemini-1.5-pro')
+anthropic_sonnet = Anthropic(api_key=anthropic_api_key)
 
 # get test model responses
 def get_gpt_response(messages, model):
     retries = 0
     while retries <= 3:
         try:
+            kwargs = {
+                "model": model,
+                "messages": messages,
+            }
+            if model != "o1-preview":
+                kwargs["temperature"] = 0.7
+                kwargs["max_tokens"] = 100
             completion = openai_model.chat.completions.create(
-                model=model,
-                messages=messages,
-                temperature=0.7,
-                max_tokens=100
+                **kwargs
             )
             return completion.choices[0].message.content    
         except Exception as e:
@@ -107,7 +111,7 @@ def get_gemini_response(messages,model):
             time.sleep(delay)
 
     return ""  
-    
+
 def get_claude_response(messages, model):
     retries = 0
     while retries <= 3:
@@ -193,7 +197,7 @@ def get_llama_response(messages, model):
             time.sleep(delay)
 
     return ""
-    
+
 
 # evaluate responses for pragmatic harms
 def eval_conversation(conversation):
@@ -261,7 +265,7 @@ def eval_conversation(conversation):
             print(f"Attempt {retries} failed. Retrying in {delay:.2f} seconds...")
             time.sleep(delay)
 
-    
+
 def get_random_facts(n):
     facts_df = pd.read_excel('facts.xlsx', header=None)  # read the Excel file containing facts
     return random.sample(facts_df[0].tolist(), n)  # randomly select n facts from first column
@@ -287,17 +291,17 @@ def process_conversation(model, row):
     # iterate through all the turns
     for turn, user_input in enumerate(row, start=1):
         if pd.notna(user_input): # if cell has contents
-            
+
             # only the hard constraint, save for eval
             if turn == 1:
                 first_user_input = user_input
             elif turn == cat:
-                    category = user_input
+                category = user_input
             else: 
                 conversation.append({"role": "user", "content": user_input})
                 print(f"User (Turn {turn-1}): {user_input}")
 
-                if model in ["gpt-3.5-turbo", "gpt-4o"]:
+                if model in ["gpt-3.5-turbo", "gpt-4o", "o1-preview"]:
                     model_response = get_gpt_response(conversation, model)
                 elif model in ["gemini-1.5-flash", "gemini-1.5-pro"]:
                     model_response = get_gemini_response(conversation, google_model_flash)
@@ -305,18 +309,24 @@ def process_conversation(model, row):
                     model_response = get_claude_response(conversation, model)
                 elif model == "mistralai/mixtral-8x7b-instruct-v0.1":
                     model_response = get_mistral_response(conversation, model)
-                elif model in ["meta/meta-llama-3-70b-instruct", "meta/meta-llama-3.1-405b-instruct"]:
+                elif model in [
+                    "meta/meta-llama-3-70b-instruct",
+                    "meta/meta-llama-3.1-405b-instruct",
+                    "meta/meta-llama-3-70b",
+                    "meta/meta-llama-3-8b"
+                ]:
                     model_response = get_llama_response(conversation, model)
 
                 if turn == last_turn:
                     last_user_input = user_input
                     if last_model_response != "":
                         last_model_response = model_response  
-                    else:  last_model_response = "I have no response"
+                    else:
+                        last_model_response = "I have no response"
 
                 print(f"Assistant (Turn {turn}): {model_response}")
                 conversation.append({"role": "assistant", "content": model_response})
-    
+
     print("--- End of Conversation ---\n")
 
     # construct the condensed conversation for eval
@@ -328,7 +338,7 @@ def process_conversation(model, row):
     {last_model_response}\n
     """
     print(f"{condensed_convo}")
- 
+
     # evaluate the condensed conversation
     rating, explanation = eval_conversation(condensed_convo)
     print(f"Evaluation result:\nRating: {rating}\nExplanation: {explanation}\n")
@@ -413,7 +423,7 @@ def run_benchmark():
     binary_results = []
     neutral_results = []
     
-    models = ["gpt-4o", "meta/meta-llama-3-70b-instruct", "mistralai/mixtral-8x7b-instruct-v0.1", "gpt-3.5-turbo", "gemini-1.5-flash", "gemini-1.5-pro", "claude-3-5-sonnet-20240620", "meta/meta-llama-3.1-405b-instruct"] # complete
+    models = ["gpt-4o", "meta/meta-llama-3-8b-instruct", "meta/meta-llama-3-70b-instruct", "meta/meta-llama-3-70b-instruct", "mistralai/mixtral-8x7b-instruct-v0.1", "gpt-3.5-turbo", "gemini-1.5-flash", "gemini-1.5-pro", "claude-3-5-sonnet-20240620", "meta/meta-llama-3.1-405b-instruct", "o1-preview"] # complete
     # models = ["gemini-1.5-pro"] # for testing
 
 
@@ -890,5 +900,3 @@ def run_benchmark():
 
 if __name__ == "__main__":
     run_benchmark()
-
-
