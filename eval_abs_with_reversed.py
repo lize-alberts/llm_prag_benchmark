@@ -413,9 +413,9 @@ def run_benchmark():
     binary_results = []
     neutral_results = []
 
-    # models = deque(["gpt-4o", "meta/meta-llama-3-70b-instruct", "mistralai/mixtral-8x7b-instruct-v0.1", "gpt-3.5-turbo", "gemini-1.5-pro", "meta/meta-llama-3.1-405b-instruct"]) # complete
-    models = deque(["mistralai/mixtral-8x7b-instruct-v0.1"])  # for testing
-    # models.rotate(5)
+    models = deque(["gpt-4o", "meta/meta-llama-3-70b-instruct", "mistralai/mixtral-8x7b-instruct-v0.1", "gpt-3.5-turbo", "gemini-1.5-pro", "meta/meta-llama-3.1-405b-instruct"]) # complete
+    # models = deque(["mistralai/mixtral-8x7b-instruct-v0.1"])  # for testing
+    models.rotate(5)
 
     # Scenario 3 ablations
     '''

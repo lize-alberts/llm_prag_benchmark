@@ -41,20 +41,20 @@ import random
 from collections import deque
 
 # ensure API keys/tokens are set
-openai_api_key = os.environ.get("OPENAI_API_KEY")
+# openai_api_key = os.environ.get("OPENAI_API_KEY")
 google_api_key = os.environ.get("GOOGLE_API_KEY")
 replicate_api_token = os.environ.get("REPLICATE_API_TOKEN")
-# anthropic_api_key = os.environ.get("ANTHROPIC_API_KEY")
+anthropic_api_key = os.environ.get("ANTHROPIC_API_KEY")
 
-if not all([openai_api_key, google_api_key, replicate_api_token]):
+if not all([google_api_key, replicate_api_token, anthropic_api_key]):
     raise ValueError("Please set all required API keys/tokens as environment variables")
 
 # initialise models
-openai_model = OpenAI() 
+# openai_model = OpenAI() 
 genai.configure(api_key=google_api_key)
 google_model_flash = genai.GenerativeModel('gemini-1.5-flash')
 google_model_pro = genai.GenerativeModel('gemini-1.5-pro')
-# anthropic_sonnet = Anthropic(api_key=anthropic_api_key)
+anthropic_sonnet = Anthropic(api_key=anthropic_api_key)
 
 # get test model responses
 def get_gpt_response(messages, model):
@@ -64,8 +64,8 @@ def get_gpt_response(messages, model):
             completion = openai_model.chat.completions.create(
                 model=model,
                 messages=messages,
-                temperature=0.7,
-                max_tokens=100
+                # temperature=0.7,
+                # max_completion_tokens=100
             )
             return completion.choices[0].message.content    
         except Exception as e:
@@ -298,15 +298,15 @@ def process_conversation(model, row):
                 conversation.append({"role": "user", "content": user_input})
                 print(f"User (Turn {turn-1}): {user_input}")
 
-                if model in ["gpt-3.5-turbo", "gpt-4o"]:
+                if model in ["gpt-3.5-turbo", "gpt-4o", "o1-preview"]:
                     model_response = get_gpt_response(conversation, model)
                 elif model in ["gemini-1.5-flash", "gemini-1.5-pro"]:
                     model_response = get_gemini_response(conversation, google_model_flash)
                 elif model == "claude-3-5-sonnet-20240620":
                     model_response = get_claude_response(conversation, model)
-                elif model == "mistralai/mixtral-8x7b-instruct-v0.1":
+                elif model in ["mistralai/mixtral-8x7b-instruct-v0.1", "mistralai/mistral-7b-v0.1"]:
                     model_response = get_mistral_response(conversation, model)
-                elif model in ["meta/meta-llama-3-70b-instruct", "meta/meta-llama-3.1-405b-instruct"]:
+                elif model in ["meta/meta-llama-3-70b-instruct", "meta/meta-llama-3.1-405b-instruct", "meta/meta-llama-3-8b-instruct", "meta/meta-llama-3-70b"]:
                     model_response = get_llama_response(conversation, model)
 
                 if turn == last_turn:
@@ -412,7 +412,7 @@ def run_benchmark():
     binary_results = []
     neutral_results = []
     
-    models = deque(["gpt-4o", "meta/meta-llama-3-70b-instruct", "mistralai/mixtral-8x7b-instruct-v0.1", "gpt-3.5-turbo", "gemini-1.5-pro", "meta/meta-llama-3.1-405b-instruct"]) # complete
+    models = deque(["claude-3-5-sonnet-20240620", "meta/meta-llama-3-8b-instruct", "meta/meta-llama-3-70b"]) # complete
     models.rotate(2)
     # models = ["gemini-1.5-pro"] # for testing
      
