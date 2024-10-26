@@ -31,9 +31,13 @@ def shorten_model_name(name):
         "gemini-1.5-pro": "Gemini 1.5 Pro",
         "gpt-3.5-turbo": "GPT 3.5 Turbo",
         "gpt-4o": "GPT 4o",
-        "meta/meta-llama-3-70b-instruct": "Llama 3 70B",
+        "meta/meta-llama-3-70b-instruct": "Llama 3 70B (Instruct)",
         "meta/meta-llama-3.1-405b-instruct": "Llama 3.1 405B",
-        "mistralai/mixtral-8x7b-instruct-v0.1": "Mixtral 8x7B"
+        "mistralai/mixtral-8x7b-instruct-v0.1": "Mixtral 8x7B",
+        "o1-preview": "OpenAI o1",
+        "claude-3-5-sonnet-20240620": "Claude 3.5 Sonnet",
+        "meta/meta-llama-3-70b": "Llama 3 70B",
+        "meta/meta-llama-3-8b-instruct": "Llama 3 8B",
     }
     return name_map.get(name, name)
 
@@ -103,7 +107,7 @@ def create_visualizations(results_df):
     ax = scenario_ambiguity_percentages.plot(kind='bar', stacked=True)
     plt.xlabel('Scenario', fontsize=10)
     plt.ylabel('Percentage', fontsize=10)
-    plt.legend(title='Factors Contributing to Ambiguous Results', bbox_to_anchor=(0.5, -0.15), loc='upper center', ncol=3, fontsize=10)
+    plt.legend(title='Factors Contributing to Ambiguous Results', bbox_to_anchor=(0.5, -0.3), loc='upper center', ncol=3, fontsize=10)
     
     # ax.set_xticklabels(range(1, 6), fontsize=10, rotation=0)  # Set rotation to 0 for upright labels
     plt.yticks(fontsize=10)
@@ -128,12 +132,12 @@ def create_focused_ambiguity_visualization(results_df, total_conversations=337):
     # Create the stacked bar plot
     plt.figure(figsize=(22, 10))
     ax = model_scenario_percentage.plot(kind='bar', stacked=True)
-    
+
     plt.xlabel('Model', fontsize=10)
     plt.ylabel('Percentage of Total Conversations', fontsize=10)
-    plt.xticks(rotation=0, fontsize=9)
+    plt.xticks(rotation=45, fontsize=9)
     plt.yticks(fontsize=10)
-    
+
     # Add percentage labels on the bars
     for c in ax.containers:
         ax.bar_label(c, fmt='%.1f%%', label_type='center', fontsize=8)
@@ -144,7 +148,7 @@ def create_focused_ambiguity_visualization(results_df, total_conversations=337):
 
     # Adjust legend
     plt.legend(title='Scenarios', 
-               bbox_to_anchor=(0.5, -0.15), 
+               bbox_to_anchor=(0.5, -0.4), 
                loc='upper center', 
                ncol=5, 
                fontsize=8)
@@ -279,7 +283,6 @@ def load_all_results(file_paths):
     return [
         load_results(file_path) for file_path in file_paths if "neutral" in file_path
     ]
-
 
 
 def main():
