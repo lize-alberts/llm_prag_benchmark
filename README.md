@@ -1,8 +1,8 @@
 # LLM Pragmatic Harms Evaluation
 
-This project runs a benchmark on language models using conversations from an Excel file. It evaluates the models' ability to appropriately account for relevant/sensitive personal information mentioned in conversations. 
+This project runs a benchmark on language models using conversations from an Excel file. It evaluates the models' ability to account for relevant/sensitive personal information mentioned in conversations. 
 
-It uses Llama 3.1 45B to conduct evaluations as it was found to be the current most reliable (and affordable)
+It uses LLaMA 3.1 405B (Instruct) to conduct evaluations as it was found to be the current most reliable (and affordable)
 
 ## Setup
 
