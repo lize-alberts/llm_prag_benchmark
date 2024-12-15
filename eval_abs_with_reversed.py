@@ -407,7 +407,7 @@ def create_visualizations(results_df):
 
 # get contextual prompts as input data, process for each model, and save results in dataframe/excel file
 def run_benchmark():
-    input_data = pd.read_excel('inputs_80_with_reversed.xlsx')
+    input_data = pd.read_excel('inputs_80.xlsx')
     # input_data = pd.read_excel('inputs_test.xlsx')
 
     binary_results = []
